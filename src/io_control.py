@@ -4,10 +4,6 @@ import pywinauto.keyboard as keyboard
 
 
 class IoControl:
-
-    PLAY_AREA_START_POS = (330, 510)  # start left, start top
-    PLAY_AREA_SIZE = (375, 75)  # width, height
-
     def __init__(self):
         self.app: Application = None
         self.dlg: WindowSpecification = None
@@ -19,12 +15,6 @@ class IoControl:
     def focus(self):
         self.dlg.set_focus()
 
-    def get_area_pos(self) -> dict:
+    def get_app_region(self) -> tuple:
         rect = self.dlg.rectangle()
-        region = {
-            "top": rect.top + 510,
-            "left": rect.left + 330,
-            "width": 375,
-            "height": 75,
-        }
-        return region
+        return (rect.left, rect.top, rect.right, rect.bottom)
