@@ -11,7 +11,7 @@ from .perfect_detector import PerfectDetector
 class AuditionCtrl:
     PLAY_AREA = (330, 510, 700, 585)  # left, top, right, bottom
     KEYS_AREA = (330, 540, 700, 580)
-    PERFECT_AREA = ()
+    PERFECT_AREA = (515, 520, 685, 525)
 
     KEYS_THRESHOLD = 254
 
