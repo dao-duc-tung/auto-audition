@@ -1,9 +1,12 @@
 from pywinauto.application import Application, WindowSpecification
 import pywinauto.mouse as mouse
 import pywinauto.keyboard as keyboard
+import time
 
 
 class IoControl:
+    KEY_TYPING_SLEEP = 0.001
+
     def __init__(self):
         self.app: Application = None
         self.dlg: WindowSpecification = None
@@ -19,6 +22,8 @@ class IoControl:
         rect = self.dlg.rectangle()
         return (rect.left, rect.top, rect.right, rect.bottom)
 
-    def send_keys(self, keys):
-        # keyboard.send_keys(keys)
-        print(keys)
+    def send_keys(self, keys: list):
+        for key in keys:
+            print(key)
+            keyboard.send_keys(key)
+            time.sleep(IoControl.KEY_TYPING_SLEEP)

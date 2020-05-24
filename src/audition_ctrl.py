@@ -17,7 +17,7 @@ class AuditionCtrl:
     CONF_FILE = r"D:\zother\auto-audition\app.conf"
     AUAU_SECTION = "AuAu"
 
-    PID = 11484
+    PID = 15928
     PLAY_AREA = (330, 510, 700, 585)  # left, top, right, bottom
     KEYS_AREA = (330, 540, 700, 580)
     PERFECT_AREA = (515, 520, 685, 525)
@@ -56,8 +56,8 @@ class AuditionCtrl:
 
     def run(self):
         self.measure_speed()
-        self.io_control.focus()
 
+        self.io_control.focus()
         while self.running:
             self.app_conf.read()
             AuditionCtrl.PERFECT_ADJUSTMENT = self.app_conf.get(
@@ -73,11 +73,10 @@ class AuditionCtrl:
                 time.sleep(AuditionCtrl.RUN_SLEEP)
                 continue
             self.io_control.send_keys(keys)
-            wait_time = self.get_wait_perfect_time()
-            self.hit_perfect(wait_time)
+            perfect_time = self.get_wait_perfect_time()
+            self.hit_perfect(perfect_time)
 
             while not self.is_marker_at_tail():
-                time.sleep(AuditionCtrl.RUN_SLEEP)
                 continue
 
         cv2.destroyAllWindows()
@@ -106,13 +105,14 @@ class AuditionCtrl:
         return keys
 
     def get_wait_perfect_time(self):
-        wait_time = self.perfect_detector.get_wait_perfect(self.speed)
-        wait_time += AuditionCtrl.PERFECT_ADJUSTMENT
-        return wait_time
+        perfect_time = self.perfect_detector.get_wait_perfect(self.speed)
+        return perfect_time
 
-    def hit_perfect(self, sleep_time):
+    def hit_perfect(self, perfect_time):
         def func():
-            time.sleep(sleep_time)
+            sleep_time = perfect_time - time.time() + AuditionCtrl.PERFECT_ADJUSTMENT
+            if sleep_time > 0:
+                time.sleep(sleep_time)
             self.io_control.send_keys(self.perfect_detector.KEY_SPACE)
 
         t = threading.Thread(target=func)

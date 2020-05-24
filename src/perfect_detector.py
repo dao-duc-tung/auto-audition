@@ -24,7 +24,7 @@ class PerfectDetector:
         r"D:\zother\auto-audition\data\marker.png", cv2.IMREAD_GRAYSCALE
     )
     MARKER_CENTER_OFFSET = 4
-    KEY_SPACE = "{SPACE}"
+    KEY_SPACE = ["{VK_CONTROL down}", "{VK_CONTROL up}"]
 
     def __init__(self):
         self.perfect_area = {}
@@ -46,8 +46,6 @@ class PerfectDetector:
             speed = (sct2.marker_pos - sct1.marker_pos) / (sct2.tm - sct1.tm)
             speeds.append(speed)
 
-            cv2.imshow("Sct1", sct1.img)
-            cv2.imshow("Sct2", sct2.img)
             print(f"{sct1.marker_pos} {sct2.marker_pos} {speed}")
 
         avg = statistics.mean(speeds)
@@ -68,6 +66,9 @@ class PerfectDetector:
         return x + PerfectDetector.MARKER_CENTER_OFFSET
 
     def get_wait_perfect(self, speed):
+        """
+        Return next time to hit perfect
+        """
         sct = self.get_sct_img_with_marker()
         t = (PerfectDetector.PERFECT_POS - sct.marker_pos) / speed
-        return t
+        return t + sct.tm

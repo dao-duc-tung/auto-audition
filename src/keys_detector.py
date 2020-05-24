@@ -9,28 +9,30 @@ class KeysDetector:
     UP = 1
     RIGHT = 2
     DOWN = 3
-    KEY_LEFT = "{LEFT}"
-    KEY_UP = "{UP}"
-    KEY_RIGHT = "{RIGHT}"
-    KEY_DOWN = "{DOWN}"
+    KEY_LEFT = ["{LEFT down}", "{LEFT up}"]
+    KEY_UP = ["{UP down}", "{UP up}"]
+    KEY_RIGHT = ["{RIGHT down}", "{RIGHT up}"]
+    KEY_DOWN = ["{DOWN down}", "{DOWN up}"]
 
     def __init__(self):
         pass
 
     def detect(self, gray) -> str:
-        thres_img = self.threshold_gray(gray)
-        cnts = self.find_contours(thres_img)
-        (cnts, boundingBoxes) = self.sort_contours(cnts)
+        keys = []
 
-        keys = ""
-        for i in range(len(boundingBoxes)):
-            key_roi = self.get_key_roi(thres_img, boundingBoxes[i])
-            direction = self.get_direction(key_roi)
-            key = self.direction_to_key(direction)
-            keys += key
+        try:
+            thres_img = self.threshold_gray(gray)
+            cnts = self.find_contours(thres_img)
+            (cnts, boundingBoxes) = self.sort_contours(cnts)
 
-        cv2.imshow("Keys", gray)
-        cv2.imshow("Thresholded Keys", thres_img)
+            for i in range(len(boundingBoxes)):
+                key_roi = self.get_key_roi(thres_img, boundingBoxes[i])
+                direction = self.get_direction(key_roi)
+                key = self.direction_to_key(direction)
+                keys.extend(key)
+
+        except:
+            pass
 
         return keys
 
@@ -64,9 +66,9 @@ class KeysDetector:
     def get_direction(self, roi):
         h, w = roi.shape
         reg0 = roi[:, 0 : w // 3]
-        reg1 = roi[2 * h // 3 : h, :]
+        reg1 = roi[0 : h // 3, :]
         reg2 = roi[:, 2 * w // 3 : w]
-        reg3 = roi[0 : h // 3, :]
+        reg3 = roi[2 * h // 3 : h, :]
 
         rate0 = cv2.countNonZero(reg0)
         rate1 = cv2.countNonZero(reg1)
