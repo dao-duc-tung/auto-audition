@@ -1,6 +1,7 @@
 from PIL import Image
 import cv2
 import mss
+import numpy as np
 import time
 
 from .sct_img import SctImg
@@ -26,9 +27,9 @@ def to_gray(img):
     return cv2.cvtColor(img, cv2.COLOR_BGRA2GRAY)
 
 
-def capture(self, area) -> SctImg:
+def capture(area) -> SctImg:
     with mss.mss() as sct:
         capture_time = time.time()
-        img = sct.grab(area)
+        img = np.array(sct.grab(area))
         sct_img = SctImg(img, capture_time)
     return sct_img

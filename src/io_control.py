@@ -8,8 +8,8 @@ class IoControl:
         self.app: Application = None
         self.dlg: WindowSpecification = None
 
-    def connect(self, path: str):
-        self.app = Application().connect(path=path)
+    def connect(self, pid):
+        self.app = Application().connect(process=pid)
         self.dlg = self.app["Audition"]
 
     def focus(self):

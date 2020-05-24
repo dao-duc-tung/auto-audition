@@ -15,6 +15,7 @@ class PerfectSct(SctImg):
     def clone(cls, sct: SctImg, marker_pos=0):
         sct = cls(sct.img, sct.tm)
         sct.marker_pos = marker_pos
+        return sct
 
 
 class PerfectDetector:
@@ -45,9 +46,9 @@ class PerfectDetector:
             speed = (sct2.marker_pos - sct1.marker_pos) / (sct2.tm - sct1.tm)
             speeds.append(speed)
 
-            cv2.imshow("Sct1", gray1)
-            cv2.imshow("Sct2", gray2)
-            print(f"{marker_pos_1} {marker_pos_2} {speed}")
+            cv2.imshow("Sct1", sct1.img)
+            cv2.imshow("Sct2", sct2.img)
+            print(f"{sct1.marker_pos} {sct2.marker_pos} {speed}")
 
         avg = statistics.mean(speeds)
         return avg
@@ -61,12 +62,12 @@ class PerfectDetector:
         sct.marker_pos = marker_pos
         return sct
 
-    def get_marker_pos(self, perfect_area_img, marker):
+    def get_marker_pos(self, perfect_area_img, marker_img):
         result = cv2.matchTemplate(perfect_area_img, marker_img, cv2.TM_CCOEFF)
         (minVal, maxVal, minLoc, (x, y)) = cv2.minMaxLoc(result)
         return x + PerfectDetector.MARKER_CENTER_OFFSET
 
     def get_wait_perfect(self, speed):
-        sct = self.get_sct_img_with_marker(self.perfect_area)
+        sct = self.get_sct_img_with_marker()
         t = (PerfectDetector.PERFECT_POS - sct.marker_pos) / speed
         return t

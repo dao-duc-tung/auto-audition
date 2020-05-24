@@ -1,3 +1,8 @@
+import cv2
+import imutils
+import numpy as np
+
+
 class KeysDetector:
     KEYS_THRESHOLD = 254
     LEFT = 0
@@ -37,7 +42,7 @@ class KeysDetector:
 
     def find_contours(self, thres_img):
         cnts = cv2.findContours(
-            thres.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
+            thres_img.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
         )
         cnts = imutils.grab_contours(cnts)
         return cnts
