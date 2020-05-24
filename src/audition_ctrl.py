@@ -1,11 +1,14 @@
 import cv2
 import mss
-import numpy
+import numpy as np
 import signal
+import threading
+import time
 
 from .io_control import IoControl
 from .keys_detector import KeysDetector
 from .perfect_detector import PerfectDetector
+from .sct_img import SctImg
 
 
 class AuditionCtrl:
@@ -13,10 +16,11 @@ class AuditionCtrl:
     KEYS_AREA = (330, 540, 700, 580)
     PERFECT_AREA = (515, 520, 685, 525)
 
-    KEYS_THRESHOLD = 254
+    PERFECT_DELAY = 0.1
 
     def __init__(self):
         self.running = True
+        self.speed = 1.0
         self.io_control = IoControl()
         self.keys_detector = KeysDetector()
         self.perfect_detector = PerfectDetector()
@@ -25,43 +29,50 @@ class AuditionCtrl:
     def exit_handler(self, sig, frame):
         self.running = False
 
+    def measure_speed(self):
+        self.io_control.focus()
+        perfect_area = self.get_area_pos(AuditionCtrl.PERFECT_AREA)
+        self.speed = self.perfect_detector.measure_speed(perfect_area)
+
     def run(self):
+        self.measure_speed()
+
         with mss.mss() as sct:
             self.io_control.focus()
-            play_area = self.get_play_area_pos()
 
             while self.running:
-                play_area_img = numpy.array(sct.grab(play_area))
+                keys_area = self.get_area_pos(AuditionCtrl.KEYS_AREA)
+                keys_img = numpy.array(sct.grab(keys_area))
+                keys = self.keys_detector.detect(keys_img)
+                self.io_control.send_keys(keys)
 
-                self.process(play_area_img)
+                wait_time = self.get_wait_perfect_time()
+                self.hit_perfect(wait_time)
 
                 cv2.imshow("Main Win", play_area_img)
 
-            cv2.destroyAllWindows()
+        cv2.destroyAllWindows()
 
-    def get_play_area_pos(self) -> dict:
+    def hit_perfect(self, sleep_time):
+        def func():
+            time.sleep(sleep_time)
+            self.io_control.send_keys(self.perfect_detector.KEY_SPACE)
+
+        t = threading.Thread(target=func)
+        t.start()
+
+    def get_wait_perfect_time(self):
+        perfect_area = self.get_area_pos(AuditionCtrl.PERFECT_AREA)
+        wait_time = self.perfect_detector.get_wait_perfect(perfect_area, self.speed)
+        wait_time -= AuditionCtrl.PERFECT_DELAY
+        return wait_time
+
+    def get_area_pos(self, area) -> dict:
         app_reg = self.io_control.get_app_region()
         region = {
-            "top": app_reg[1] + AuditionCtrl.PLAY_AREA[1],
-            "left": app_reg[0] + AuditionCtrl.PLAY_AREA[0],
-            "width": AuditionCtrl.PLAY_AREA[2] - AuditionCtrl.PLAY_AREA[0],
-            "height": AuditionCtrl.PLAY_AREA[3] - AuditionCtrl.PLAY_AREA[1],
+            "top": app_reg[1] + area[1],
+            "left": app_reg[0] + area[0],
+            "width": area[2] - area[0],
+            "height": area[3] - area[1],
         }
         return region
-
-    def process(self, play_area_img):
-        gray = cv2.cvtColor(play_area_img, cv2.COLOR_BGRA2GRAY)
-
-        key_area = gray[
-            AuditionCtrl.KEYS_AREA[1] : AuditionCtrl.KEYS_AREA[3],
-            AuditionCtrl.KEYS_AREA[0] : AuditionCtrl.KEYS_AREA[2],
-        ]
-        keys = self.keys_detector.detect(key_area)
-
-        perfect_area = gray[
-            AuditionCtrl.PERFECT_AREA[1] : AuditionCtrl.PERFECT_AREA[3],
-            AuditionCtrl.PERFECT_AREA[0] : AuditionCtrl.PERFECT_AREA[2],
-        ]
-        perfect_time = self.perfect_detector.detect(perfect_area)
-
-        # control

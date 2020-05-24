@@ -18,3 +18,6 @@ class IoControl:
     def get_app_region(self) -> tuple:
         rect = self.dlg.rectangle()
         return (rect.left, rect.top, rect.right, rect.bottom)
+
+    def send_keys(self, keys):
+        keyboard.send_keys(keys)

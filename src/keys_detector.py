@@ -1,8 +1,13 @@
 class KeysDetector:
+    KEYS_THRESHOLD = 254
     LEFT = 0
     UP = 1
     RIGHT = 2
     DOWN = 3
+    KEY_LEFT = "{LEFT}"
+    KEY_UP = "{UP}"
+    KEY_RIGHT = "{RIGHT}"
+    KEY_DOWN = "{DOWN}"
 
     def __init__(self):
         pass
@@ -16,13 +21,14 @@ class KeysDetector:
         for i in range(len(boundingBoxes)):
             key_roi = self.get_key_roi(thres_img, boundingBoxes[i])
             direction = self.get_direction(key_roi)
-            keys.append(direction)
+            key = self.direction_to_key(direction)
+            keys.append(key)
 
         return keys
 
     def threshold_gray(self, gray):
         _, thres = cv2.threshold(
-            gray, AuditionCtrl.KEYS_THRESHOLD, 255, cv2.THRESH_BINARY
+            gray, KeysDetector.KEYS_THRESHOLD, 255, cv2.THRESH_BINARY
         )
         return thres
 
@@ -62,3 +68,13 @@ class KeysDetector:
         arr = np.array((rate0, rate1, rate2, rate3))
         direction = np.argmax(arr)
         return direction
+
+    def direction_to_key(self, direction):
+        if direction == KeysDetector.UP:
+            return KeysDetector.KEY_UP
+        elif direction == KeysDetector.DOWN:
+            return KeysDetector.KEY_DOWN
+        elif direction == KeysDetector.LEFT:
+            return KeysDetector.KEY_LEFT
+        elif direction == KeysDetector.RIGHT:
+            return KeysDetector.KEY_RIGHT
