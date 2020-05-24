@@ -12,17 +12,20 @@ class KeysDetector:
     def __init__(self):
         pass
 
-    def detect(self, gray) -> list:
+    def detect(self, gray) -> str:
         thres_img = self.threshold_gray(gray)
         cnts = self.find_contours(thres_img)
         (cnts, boundingBoxes) = self.sort_contours(cnts)
 
-        keys = []
+        keys = ""
         for i in range(len(boundingBoxes)):
             key_roi = self.get_key_roi(thres_img, boundingBoxes[i])
             direction = self.get_direction(key_roi)
             key = self.direction_to_key(direction)
-            keys.append(key)
+            keys += key
+
+        cv2.imshow("Keys", gray)
+        cv2.imshow("Thresholded Keys", thres_img)
 
         return keys
 
