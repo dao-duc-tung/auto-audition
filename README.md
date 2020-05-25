@@ -33,7 +33,7 @@ These regions are in fixed positions.
 
 Finally, some tricky image processing algorithms will be performed
 on the keys area to detect the keys.
-Simultaneously, some algorithms will also be applied on the perfect area
+Simultaneously, some algorithms will also be applied in the perfect area
 to detect the time when we should hit Ctrl (to hit perfect).
 
 
@@ -52,7 +52,7 @@ by getting the bounding boxes of those contours.
 </p>
 
 For each ROI (bounding box of key's contour) as below, I split it into 4 regions
-red, blue, green and purple. The region that has the highest amount of white pixels
+red, blue, green, and purple. The region that has the highest amount of white pixels
 will contain the arrow's head.
 
 <p align="center">
@@ -93,7 +93,7 @@ time it takes to go to the Perfect Position by using the above computed speed.
 I create 2 threads. One thread is to control the keys. The other one is
 to control when we should hit Ctrl.
 
-I also define "one loop" is the period of time that the marker run from the head
+I also define "one loop" is the period of time that the marker runs from the head
 to the end (tail) or the perfect bar.
 
 <p align="center">
@@ -103,11 +103,11 @@ to the end (tail) or the perfect bar.
 On the keys controlling thread, I wait until the marker is at the head part.
 Then I perform keys detection and send the keyboard code to the game window.
 Then I wait until the marker is at the tail part. That is to make sure
-the keys detection will be performed one time per one loop.
+the keys detection will be performed one time per loop.
 
 For the Ctrl hitting thread, the Ctrl hitting time detection will be started
 only when the marker passed the middle of the perfect bar. This is to make sure
-the algorithm doesn't measure the hitting time too soon. The farer
+the algorithm doesn't measure the hitting time too soon. The farther
 the marker is to the perfect position, the worse the measurement will be.
 
 <p align="center">
@@ -115,7 +115,7 @@ the marker is to the perfect position, the worse the measurement will be.
 </p>
 
 Because the measurement of the time we should hit Ctrl is not good enough,
-everytime it calculates I will add/subtract a small amount of time.
+every time it calculates I will add/subtract a small amount of time.
 I use `Page Up` and `Page Down` buttons to adjust that small changes.
 [keyboard library](https://pypi.org/project/keyboard/) was used to listen to
 the global key events.
@@ -129,11 +129,11 @@ should be hit.
 
 ## Limitation
 
-I don't design any mechanism to get the feedback of how accurate the measurement is.
+I don't design any mechanism to get feedback on how accurate the measurement is.
 Therefore, there's no way to adjust the hitting Ctrl time.
 
-The project should be done by using Reinforcement-Learning-based method or
-some PID-based algorithm with feedback mechanism to adjust the control.
+The project should be done by using the Reinforcement-Learning-based method or
+some PID-based algorithm with the feedback mechanism to adjust the control.
 
 
 ## Installation
