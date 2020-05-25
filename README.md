@@ -9,9 +9,15 @@ Commercializing this project is prohibited and illegal.
 
 ## Results
 
-[![Video 1](data/example1.png)](https://github.com/dao-duc-tung/auto-audition/raw/master/data/video1.mp4)
-
-[![Video 2](data/example2.png)](https://github.com/dao-duc-tung/auto-audition/raw/master/data/video2.mp4)
+<p align="center">
+    <video controls="controls">
+        <source type="video/mp4" src="https://github.com/dao-duc-tung/auto-audition/raw/master/data/video1.mp4"></source>
+    </video>
+    </br>
+    <video controls="controls">
+        <source type="video/mp4" src="https://github.com/dao-duc-tung/auto-audition/raw/master/data/video2.mp4"></source>
+    </video>
+</p>
 
 
 ## How it works?
