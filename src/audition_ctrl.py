@@ -15,7 +15,7 @@ from .utils import *
 
 
 class AuditionCtrl:
-    CONF_FILE = r"D:\zother\auto-audition\app.conf"
+    CONF_FILE = r".\app.conf"
     AUAU_SECTION = "AuAu"
 
     PID = 0
