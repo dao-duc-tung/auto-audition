@@ -1,4 +1,4 @@
-# Auto Audition Game Hacker
+# Auto Audition Game Hack Software
 
 Auto play Audition game by using basic image processing techniques.
 
@@ -10,13 +10,9 @@ Commercializing this project is prohibited and illegal.
 ## Results
 
 <p align="center">
-    <video controls="controls">
-        <source type="video/mp4" src="https://github.com/dao-duc-tung/auto-audition/raw/master/data/video1.mp4"></source>
-    </video>
+    <img src="data/example1.gif" alt="Example 1" />
     </br>
-    <video controls="controls">
-        <source type="video/mp4" src="https://github.com/dao-duc-tung/auto-audition/raw/master/data/video2.mp4"></source>
-    </video>
+    <img src="data/example2.gif" alt="Example 2" />
 </p>
 
 
@@ -30,8 +26,7 @@ Secondly, the region of keys (arrows) and the perfect area
 These regions are in fixed positions.
 
 <p align="center">
-    <img src="data/perfect_bar.png"
-        alt="Perfect area" />
+    <img src="data/perfect_bar.png" alt="Perfect area" />
     </br>
     <img src="data/keys_area.png" alt="Keys area" />
 </p>
@@ -51,9 +46,9 @@ Now I have each key separated as a ROI (region of interest)
 by getting the bounding boxes of those contours.
 
 <p align="center">
-    <img src="data/thresholded_keys.png" alt="Keys area" />
+    <img src="data/thresholded_keys.png" alt="Thresholded keys" />
     </br>
-    <img src="data/contours.png" alt="Keys area" />
+    <img src="data/contours.png" alt="Contours" />
 </p>
 
 For each ROI (bounding box of key's contour) as below, I split it into 4 regions
@@ -61,7 +56,7 @@ red, blue, green and purple. The region that has the highest amount of white pix
 will contain the arrow's head.
 
 <p align="center">
-    <img src="data/keys_detection.png" alt="Keys area" />
+    <img src="data/keys_detection.png" alt="Keys detection" />
 </p>
 
 For the blue/red key, I convert the original RGB image into HSV color space then
@@ -79,7 +74,7 @@ to measure the correlation coefficients of the 2 images which are the perfect ar
 and the marker itself. The matchest position is the marker's position.
 
 <p align="center">
-    <img src="data/template_matching.png" alt="Keys area" />
+    <img src="data/template_matching.png" alt="Template matching" />
 </p>
 
 By getting 2 marker's positions at 2 consecutive periods, I interpolate the speed
@@ -89,7 +84,7 @@ For the second task, we just get the current marker's position, then calculate t
 time it takes to go to the Perfect Position by using the above computed speed.
 
 <p align="center">
-    <img src="data/perfect_position.png" alt="Keys area" />
+    <img src="data/perfect_position.png" alt="Perfect position" />
 </p>
 
 
@@ -102,7 +97,7 @@ I also define "one loop" is the period of time that the marker run from the head
 to the end (tail) or the perfect bar.
 
 <p align="center">
-    <img src="data/one_loop.png" alt="Keys area" />
+    <img src="data/one_loop.png" alt="One loop" />
 </p>
 
 On the keys controlling thread, I wait until the marker is at the head part.
@@ -116,7 +111,7 @@ the algorithm doesn't measure the hitting time too soon. The farer
 the marker is to the perfect position, the worse the measurement will be.
 
 <p align="center">
-    <img src="data/head_middle_tail.png" alt="Keys area" />
+    <img src="data/head_middle_tail.png" alt="Head middle tail" />
 </p>
 
 Because the measurement of the time we should hit Ctrl is not good enough,
