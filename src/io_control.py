@@ -24,6 +24,6 @@ class IoControl:
 
     def send_keys(self, keys: list):
         for key in keys:
-            print(key)
+            # print(key)
             keyboard.send_keys(key)
             time.sleep(IoControl.KEY_TYPING_SLEEP)

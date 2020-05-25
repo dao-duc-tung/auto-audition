@@ -4,6 +4,7 @@ import numpy as np
 import signal
 import threading
 import time
+import keyboard
 
 from .io_control import IoControl
 from .keys_detector import KeysDetector
@@ -17,14 +18,16 @@ class AuditionCtrl:
     CONF_FILE = r"D:\zother\auto-audition\app.conf"
     AUAU_SECTION = "AuAu"
 
-    PID = 15928
+    PID = 0
     PLAY_AREA = (330, 510, 700, 585)  # left, top, right, bottom
-    KEYS_AREA = (330, 540, 700, 580)
+    KEYS_AREA = (280, 540, 750, 580)
     PERFECT_AREA = (515, 520, 685, 525)
     PERFECT_HEAD = 0
+    PERFECT_MIDDLE = 0
     PERFECT_TAIL = 0
 
-    PERFECT_ADJUSTMENT = 0.01
+    PERFECT_ADJUSTMENT = 0.0
+    PERFECT_ADJUSTMENT_UNIT = 0.01
     RUN_SLEEP = 0.2
 
     def __init__(self):
@@ -36,66 +39,64 @@ class AuditionCtrl:
 
         self.prepare()
 
+    def exit_handler(self, sig, frame):
+        self.running = False
+
     def prepare(self):
         signal.signal(signal.SIGINT, self.exit_handler)
 
         self.app_conf = AppConf(AuditionCtrl.CONF_FILE)
         self.app_conf.read()
 
+        AuditionCtrl.PID = self.app_conf.get(AuditionCtrl.AUAU_SECTION, "pid")
+        AuditionCtrl.PERFECT_ADJUSTMENT_UNIT = self.app_conf.get(
+            AuditionCtrl.AUAU_SECTION, "perfect_adjustment_unit"
+        )
+
         self.io_control.connect(pid=AuditionCtrl.PID)
 
         perfect_width = AuditionCtrl.PERFECT_AREA[2] - AuditionCtrl.PERFECT_AREA[0]
         AuditionCtrl.PERFECT_HEAD = perfect_width // 4
         AuditionCtrl.PERFECT_TAIL = perfect_width * 3 // 4
+        AuditionCtrl.PERFECT_MIDDLE = perfect_width * 3 // 10
 
         perfect_area = self.get_area_pos(AuditionCtrl.PERFECT_AREA)
         self.perfect_detector.set_perfect_area(perfect_area)
 
-    def exit_handler(self, sig, frame):
-        self.running = False
+        keyboard.add_hotkey("page up", self.increase_adjustment)
+        keyboard.add_hotkey("page down", self.decrease_adjustment)
+
+    def increase_adjustment(self):
+        AuditionCtrl.PERFECT_ADJUSTMENT += AuditionCtrl.PERFECT_ADJUSTMENT_UNIT
+        print(AuditionCtrl.PERFECT_ADJUSTMENT)
+
+    def decrease_adjustment(self):
+        AuditionCtrl.PERFECT_ADJUSTMENT -= AuditionCtrl.PERFECT_ADJUSTMENT_UNIT
+        print(AuditionCtrl.PERFECT_ADJUSTMENT)
 
     def run(self):
-        self.measure_speed()
-
-        self.io_control.focus()
-        while self.running:
-            self.app_conf.read()
-            AuditionCtrl.PERFECT_ADJUSTMENT = self.app_conf.get(
-                AuditionCtrl.AUAU_SECTION, "perfect_adjustment"
-            )
-
-            if not self.is_marker_at_head():
-                time.sleep(AuditionCtrl.RUN_SLEEP)
-                continue
-
-            keys = self.get_keys()
-            if not keys:
-                time.sleep(AuditionCtrl.RUN_SLEEP)
-                continue
-            self.io_control.send_keys(keys)
-            perfect_time = self.get_wait_perfect_time()
-            self.hit_perfect(perfect_time)
-
-            while not self.is_marker_at_tail():
-                continue
-
-        cv2.destroyAllWindows()
-
-    def measure_speed(self):
         self.io_control.focus()
         self.speed = self.perfect_detector.measure_speed()
 
-    def is_marker_at_head(self):
-        sct = self.perfect_detector.get_sct_img_with_marker()
-        if sct.marker_pos < AuditionCtrl.PERFECT_HEAD:
-            return True
-        return False
+        t1 = threading.Thread(target=self.control_keys)
+        t1.start()
+        t2 = threading.Thread(target=self.control_perfect)
+        t2.start()
 
-    def is_marker_at_tail(self):
-        sct = self.perfect_detector.get_sct_img_with_marker()
-        if sct.marker_pos > AuditionCtrl.PERFECT_TAIL:
-            return True
-        return False
+        while self.running:
+            time.sleep(AuditionCtrl.RUN_SLEEP)
+
+    def control_keys(self):
+        while self.running:
+            self.wait_marker_at_head()
+
+            keys = self.get_keys()
+            if not keys:
+                continue
+            self.io_control.send_keys(keys)
+
+            self.wait_marker_at_tail()
+            time.sleep(AuditionCtrl.RUN_SLEEP)
 
     def get_keys(self):
         keys_area = self.get_area_pos(AuditionCtrl.KEYS_AREA)
@@ -104,9 +105,15 @@ class AuditionCtrl:
         keys = self.keys_detector.detect(keys_img)
         return keys
 
-    def get_wait_perfect_time(self):
-        perfect_time = self.perfect_detector.get_wait_perfect(self.speed)
-        return perfect_time
+    def control_perfect(self):
+        while self.running:
+            self.wait_marker_at_middle()
+
+            perfect_time = self.perfect_detector.get_wait_perfect(self.speed)
+            self.hit_perfect(perfect_time)
+
+            self.wait_marker_at_tail()
+            time.sleep(AuditionCtrl.RUN_SLEEP)
 
     def hit_perfect(self, perfect_time):
         def func():
@@ -117,6 +124,24 @@ class AuditionCtrl:
 
         t = threading.Thread(target=func)
         t.start()
+
+    def wait_marker_at_head(self):
+        while True:
+            sct = self.perfect_detector.get_sct_img_with_marker()
+            if sct.marker_pos < AuditionCtrl.PERFECT_HEAD:
+                return
+
+    def wait_marker_at_middle(self):
+        while True:
+            sct = self.perfect_detector.get_sct_img_with_marker()
+            if sct.marker_pos > AuditionCtrl.PERFECT_MIDDLE:
+                return
+
+    def wait_marker_at_tail(self):
+        while True:
+            sct = self.perfect_detector.get_sct_img_with_marker()
+            if sct.marker_pos > AuditionCtrl.PERFECT_TAIL:
+                return
 
     def get_area_pos(self, area) -> dict:
         app_reg = self.io_control.get_app_region()
