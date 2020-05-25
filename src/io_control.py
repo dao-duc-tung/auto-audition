@@ -5,7 +5,7 @@ import time
 
 
 class IoControl:
-    KEY_TYPING_SLEEP = 0.001
+    KEY_TYPING_SLEEP = 0.0008
 
     def __init__(self):
         self.app: Application = None

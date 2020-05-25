@@ -63,20 +63,25 @@ class AuditionCtrl:
         perfect_area = self.get_area_pos(AuditionCtrl.PERFECT_AREA)
         self.perfect_detector.set_perfect_area(perfect_area)
 
+        keyboard.add_hotkey("home", self.measure_speed)
         keyboard.add_hotkey("page up", self.increase_adjustment)
         keyboard.add_hotkey("page down", self.decrease_adjustment)
 
     def increase_adjustment(self):
-        AuditionCtrl.PERFECT_ADJUSTMENT += AuditionCtrl.PERFECT_ADJUSTMENT_UNIT
+        AuditionCtrl.PERFECT_ADJUSTMENT = round(
+            AuditionCtrl.PERFECT_ADJUSTMENT + AuditionCtrl.PERFECT_ADJUSTMENT_UNIT, 2
+        )
         print(AuditionCtrl.PERFECT_ADJUSTMENT)
 
     def decrease_adjustment(self):
-        AuditionCtrl.PERFECT_ADJUSTMENT -= AuditionCtrl.PERFECT_ADJUSTMENT_UNIT
+        AuditionCtrl.PERFECT_ADJUSTMENT = round(
+            AuditionCtrl.PERFECT_ADJUSTMENT - AuditionCtrl.PERFECT_ADJUSTMENT_UNIT, 2
+        )
         print(AuditionCtrl.PERFECT_ADJUSTMENT)
 
     def run(self):
         self.io_control.focus()
-        self.speed = self.perfect_detector.measure_speed()
+        self.measure_speed()
 
         t1 = threading.Thread(target=self.control_keys)
         t1.start()
@@ -84,7 +89,11 @@ class AuditionCtrl:
         t2.start()
 
         while self.running:
-            time.sleep(AuditionCtrl.RUN_SLEEP)
+            time.sleep(AuditionCtrl.RUN_SLEEP * 2)
+
+    def measure_speed(self):
+        self.speed = self.perfect_detector.measure_speed()
+        AuditionCtrl.PERFECT_ADJUSTMENT = 0.0
 
     def control_keys(self):
         while self.running:
