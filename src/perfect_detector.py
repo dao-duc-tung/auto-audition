@@ -20,9 +20,7 @@ class PerfectSct(SctImg):
 
 class PerfectDetector:
     PERFECT_POS = 119  # pixel
-    MARKER_IMG = cv2.imread(
-        r"D:\zother\auto-audition\data\marker.png", cv2.IMREAD_GRAYSCALE
-    )
+    MARKER_IMG = cv2.imread(r".\data\marker.png", cv2.IMREAD_GRAYSCALE)
     MARKER_CENTER_OFFSET = 4
     KEY_SPACE = ["{VK_CONTROL down}", "{VK_CONTROL up}"]
 
