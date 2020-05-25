@@ -6,11 +6,13 @@ This project was done in 2 days for the purpose of killing my time.
 
 Commercializing this project is prohibited and illegal.
 
+
 ## Results
 
 [![Video 1](data/example1.png)](https://github.com/dao-duc-tung/auto-audition/raw/master/data/video1.mp4)
 
 [![Video 2](data/example2.png)](https://github.com/dao-duc-tung/auto-audition/raw/master/data/video2.mp4)
+
 
 ## How it works?
 
@@ -137,7 +139,12 @@ some PID-based algorithm with feedback mechanism to adjust the control.
 
 Config your own conda environment by using `conda_env.txt` file.
 
-Then run `app.py` file.
+Find your game PID in Task Manager and modify the `pid` item in `app.conf` file.
+
+Then run `app.py` file with admin permission.
+
+Press `Home` button if you want to recompute the speed.
+Press `Page Up` or `Page Down` button if you want to adjust the perfect time.
 
 
 ## Contributing
