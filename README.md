@@ -8,9 +8,9 @@ Commercializing this project is prohibited and illegal.
 
 ## Results
 
-[![Watch the video](data/example1.png)](https://github.com/dao-duc-tung/auto-audition/raw/master/data/video1.mp4)
+[![Video 1](data/example1.png)](https://github.com/dao-duc-tung/auto-audition/raw/master/data/video1.mp4)
 
-[![Watch the video](data/example2.png)](https://github.com/dao-duc-tung/auto-audition/raw/master/data/video2.mp4)
+[![Video 2](data/example2.png)](https://github.com/dao-duc-tung/auto-audition/raw/master/data/video2.mp4)
 
 ## How it works?
 
