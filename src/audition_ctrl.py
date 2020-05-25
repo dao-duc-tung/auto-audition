@@ -101,8 +101,7 @@ class AuditionCtrl:
     def get_keys(self):
         keys_area = self.get_area_pos(AuditionCtrl.KEYS_AREA)
         sct = capture(keys_area)
-        keys_img = to_gray(sct.img)
-        keys = self.keys_detector.detect(keys_img)
+        keys = self.keys_detector.detect(sct.img)
         return keys
 
     def control_perfect(self):

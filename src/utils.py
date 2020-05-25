@@ -30,6 +30,6 @@ def to_gray(img):
 def capture(area) -> SctImg:
     with mss.mss() as sct:
         capture_time = time.time()
-        img = np.array(sct.grab(area))
+        img = np.array(sct.grab(area))[:, :, :3]
         sct_img = SctImg(img, capture_time)
     return sct_img
