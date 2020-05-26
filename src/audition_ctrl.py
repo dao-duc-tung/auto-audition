@@ -31,6 +31,8 @@ class AuditionCtrl:
     RUN_SLEEP = 0.2
 
     def __init__(self):
+        self.app_conf = AppConf(AuditionCtrl.CONF_FILE)
+
         self.running = True
         self.speed = 1.0
         self.io_control = IoControl()
@@ -45,7 +47,6 @@ class AuditionCtrl:
     def prepare(self):
         signal.signal(signal.SIGINT, self.exit_handler)
 
-        self.app_conf = AppConf(AuditionCtrl.CONF_FILE)
         self.app_conf.read()
 
         AuditionCtrl.PID = self.app_conf.get(AuditionCtrl.AUAU_SECTION, "pid")
@@ -54,6 +55,9 @@ class AuditionCtrl:
         )
 
         self.io_control.connect(pid=AuditionCtrl.PID)
+        self.io_control.set_key_typing_sleep(
+            self.app_conf.get(AuditionCtrl.AUAU_SECTION, "key_typing_sleep")
+        )
 
         perfect_width = AuditionCtrl.PERFECT_AREA[2] - AuditionCtrl.PERFECT_AREA[0]
         AuditionCtrl.PERFECT_HEAD = perfect_width // 4

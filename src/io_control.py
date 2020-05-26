@@ -3,13 +3,19 @@ import pywinauto.mouse as mouse
 import pywinauto.keyboard as keyboard
 import time
 
+from .app_conf import AppConf
+
 
 class IoControl:
-    KEY_TYPING_SLEEP = 0.0008
+    KEY_TYPING_SLEEP = 0.0005
 
     def __init__(self):
+        self.key_typing_sleep = IoControl.KEY_TYPING_SLEEP
         self.app: Application = None
         self.dlg: WindowSpecification = None
+
+    def set_key_typing_sleep(self, key_typing_sleep):
+        self.key_typing_sleep = key_typing_sleep
 
     def connect(self, pid):
         self.app = Application().connect(process=pid)
@@ -26,4 +32,4 @@ class IoControl:
         for key in keys:
             # print(key)
             keyboard.send_keys(key)
-            time.sleep(IoControl.KEY_TYPING_SLEEP)
+            time.sleep(self.key_typing_sleep)
