@@ -44,9 +44,8 @@ class PerfectDetector:
             speed = (sct2.marker_pos - sct1.marker_pos) / (sct2.tm - sct1.tm)
             speeds.append(speed)
 
-            print(f"{sct1.marker_pos} {sct2.marker_pos} {speed}")
-
         avg = statistics.mean(speeds)
+        print(f"Speed: {avg} pixel/s")
         return avg
 
     def get_sct_img_with_marker(self) -> PerfectSct:

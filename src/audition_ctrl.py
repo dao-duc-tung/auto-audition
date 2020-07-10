@@ -89,8 +89,10 @@ class AuditionCtrl:
 
         t1 = threading.Thread(target=self.control_keys)
         t1.start()
-        t2 = threading.Thread(target=self.control_perfect)
-        t2.start()
+
+        if self.app_conf.get(AuditionCtrl.AUAU_SECTION, "auto_perfect"):
+            t2 = threading.Thread(target=self.control_perfect)
+            t2.start()
 
         while self.running:
             time.sleep(AuditionCtrl.RUN_SLEEP * 2)
