@@ -70,6 +70,7 @@ class AuditionCtrl:
         keyboard.add_hotkey("home", self.measure_speed)
         keyboard.add_hotkey("page up", self.increase_adjustment)
         keyboard.add_hotkey("page down", self.decrease_adjustment)
+        keyboard.add_hotkey("backspace", lambda : self.exit_handler(None, None))
 
     def increase_adjustment(self):
         AuditionCtrl.PERFECT_ADJUSTMENT = round(
@@ -103,7 +104,7 @@ class AuditionCtrl:
 
     def control_keys(self):
         while self.running:
-            self.wait_marker_at_head()
+            # self.wait_marker_at_head()
 
             keys = self.get_keys()
             if not keys:
@@ -140,19 +141,19 @@ class AuditionCtrl:
         t.start()
 
     def wait_marker_at_head(self):
-        while True:
+        while True and self.running:
             sct = self.perfect_detector.get_sct_img_with_marker()
             if sct.marker_pos < AuditionCtrl.PERFECT_HEAD:
                 return
 
     def wait_marker_at_middle(self):
-        while True:
+        while True and self.running:
             sct = self.perfect_detector.get_sct_img_with_marker()
             if sct.marker_pos > AuditionCtrl.PERFECT_MIDDLE:
                 return
 
     def wait_marker_at_tail(self):
-        while True:
+        while True and self.running:
             sct = self.perfect_detector.get_sct_img_with_marker()
             if sct.marker_pos > AuditionCtrl.PERFECT_TAIL:
                 return
