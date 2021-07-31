@@ -16,6 +16,31 @@ Commercializing this project is prohibited and illegal.
 </p>
 
 
+## Installation
+
+1. Create environment
+
+```bash
+conda create --name au python=3.7.7
+conda activate au
+conda install -c conda-forge jupyterlab
+pip install opencv-python
+pip install pillow
+pip install imutils
+pip install keyboard
+pip install mss
+```
+
+2. Clone `example-app.conf` and rename to `app.conf`
+
+3. Find your game PID in Task Manager and modify the `pid` item in `app.conf` file.
+
+4. Run `app.py` file with admin permission.
+    - Press `F5` button if you want to recompute the speed.
+    - Press `F6` or `F7` button if you want to adjust the perfect time.
+    - Press `backspace` to quit program
+
+
 ## How it works?
 
 Firstly, the game window will be scanned by using
@@ -120,11 +145,7 @@ I use `Page Up` and `Page Down` buttons to adjust that small changes.
 [keyboard library](https://pypi.org/project/keyboard/) was used to listen to
 the global key events.
 
-Keyboard keys are sent to the game window
-by using [pywinauto](https://pywinauto.readthedocs.io/en/latest/).
-Note that the time between `key up` and `key down` events of arrow keys should be
-bigger than `0.0008` seconds. I guess the game developer limit how fast each key
-should be hit.
+Keyboard keys are sent to the game window by using KeyboardCtrl class (check `keyboard_ctrl.py`).
 
 
 ## Limitation
@@ -134,18 +155,6 @@ Therefore, there's no way to adjust the hitting Ctrl time.
 
 The project should be done by using the Reinforcement-Learning-based method or
 some PID-based algorithm with the feedback mechanism to adjust the control.
-
-
-## Installation
-
-Config your own conda environment by using `conda_env.txt` file.
-
-Find your game PID in Task Manager and modify the `pid` item in `app.conf` file.
-
-Then run `app.py` file with admin permission.
-
-Press `Home` button if you want to recompute the speed.
-Press `Page Up` or `Page Down` button if you want to adjust the perfect time.
 
 
 ## Contributing

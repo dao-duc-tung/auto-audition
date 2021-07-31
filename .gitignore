@@ -19,3 +19,4 @@ rc_*.py
 *.vti
 *.memmap
 *.pickle
+app.conf
