@@ -9,6 +9,8 @@ from .utils import *
 class KeysDetector:
     KEYS_THRESHOLD = 254
     K4_8_THRESHOLD = 0.63
+    LEFT_HAND_RED_CHANNEL_THRESHOLD = 110965
+
     UP = "UP"
     DOWN = "DOWN"
     LEFT = "LEFT"
@@ -18,13 +20,21 @@ class KeysDetector:
     UP_RIGHT = "UP_RIGHT"
     DOWN_RIGHT = "DOWN_RIGHT"
 
+    LEFT_HAND_UP = "LEFT_HAND_UP"
+    LEFT_HAND_DOWN = "LEFT_HAND_DOWN"
+    LEFT_HAND_LEFT = "LEFT_HAND_LEFT"
+    LEFT_HAND_RIGHT = "LEFT_HAND_RIGHT"
+
     LOWER_BLUE = np.array([110, 100, 100])
     UPPER_BLUE = np.array([130, 255, 255])
     LOWER_RED = np.array([-10, 100, 100])
     UPPER_RED = np.array([10, 255, 255])
 
     def __init__(self):
-        pass
+        self.is_two_hands_mode = False
+
+    def set_two_hands_mode(self, val):
+        self.is_two_hands_mode = val
 
     def detect(self, orig) -> str:
         keys = []
@@ -68,8 +78,8 @@ class KeysDetector:
 
         return (cnts, boundingBoxes)
 
-    def get_key_roi(self, thres_img, boxes):
-        res = thres_img[
+    def get_key_roi(self, img, boxes):
+        res = img[
             boxes[1] : (boxes[1] + boxes[3]), boxes[0] : (boxes[0] + boxes[2])
         ]
         return res
@@ -112,13 +122,17 @@ class KeysDetector:
 
             # else: direction = KeysDetector.UP
 
-        if self.is_reversed(color_key_roi):
-            direction = self.reverse_direction(direction)
+        if not self.is_two_hands_mode:
+            if self.is_reversed(color_key_roi):
+                direction = self.reverse_direction(direction)
+        else:
+            if self.is_left_hand(color_key_roi):
+                direction = self.right_to_left_hand(direction)
 
         return direction
 
-    def is_reversed(self, rgb_key_roi):
-        hsv = cv2.cvtColor(rgb_key_roi, cv2.COLOR_BGR2HSV)
+    def is_reversed(self, bgr_key_roi):
+        hsv = cv2.cvtColor(bgr_key_roi, cv2.COLOR_BGR2HSV)
 
         mask = cv2.inRange(hsv, KeysDetector.LOWER_BLUE, KeysDetector.UPPER_BLUE)
         cnt_blue = cv2.countNonZero(mask)
@@ -127,6 +141,13 @@ class KeysDetector:
         cnt_red = cv2.countNonZero(mask)
 
         if cnt_red > cnt_blue:
+            return True
+        return False
+
+    def is_left_hand(self, bgr_key_roi):
+        b, g, r = cv2.split(bgr_key_roi)
+        r_sum = np.sum(r)
+        if r_sum > KeysDetector.LEFT_HAND_RED_CHANNEL_THRESHOLD:
             return True
         return False
 
@@ -165,3 +186,21 @@ class KeysDetector:
             return KeyDef.VK_NUMPAD9
         elif direction == KeysDetector.DOWN_RIGHT:
             return KeyDef.VK_NUMPAD3
+        elif direction == KeysDetector.LEFT_HAND_UP:
+            return KeyDef.W_KEY
+        elif direction == KeysDetector.LEFT_HAND_DOWN:
+            return KeyDef.S_KEY
+        elif direction == KeysDetector.LEFT_HAND_LEFT:
+            return KeyDef.A_KEY
+        elif direction == KeysDetector.LEFT_HAND_RIGHT:
+            return KeyDef.D_KEY
+
+    def right_to_left_hand(self, direction):
+        if direction == KeysDetector.UP:
+            return KeysDetector.LEFT_HAND_UP
+        elif direction == KeysDetector.DOWN:
+            return KeysDetector.LEFT_HAND_DOWN
+        elif direction == KeysDetector.LEFT:
+            return KeysDetector.LEFT_HAND_LEFT
+        elif direction == KeysDetector.RIGHT:
+            return KeysDetector.LEFT_HAND_RIGHT

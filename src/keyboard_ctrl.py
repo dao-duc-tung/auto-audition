@@ -21,7 +21,7 @@ MAPVK_VK_TO_VSC = 0
 
 class KeyDef:
   """
-  Ref: msdn.microsoft.com/en-us/library/dd375731
+  Ref: https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
   """
   VK_TAB  = 0x09
   VK_MENU = 0x12
@@ -40,6 +40,11 @@ class KeyDef:
   VK_NUMPAD7 = 0x67 # 103
   VK_NUMPAD8 = 0x68 # 104
   VK_NUMPAD9 = 0x69 # 105
+
+  W_KEY = 0x57
+  A_KEY = 0x41
+  S_KEY = 0x53
+  D_KEY = 0x44
 
 # C struct definitions
 
@@ -95,7 +100,7 @@ user32.SendInput.argtypes = (wintypes.UINT, # nInputs
                              ctypes.c_int)  # cbSize
 
 class KeyboardCtrl:
-  PRESS_SLEEP = 0.05
+  PRESS_SLEEP = 0.04
 
   @staticmethod
   def press_key(hexKeyCode):

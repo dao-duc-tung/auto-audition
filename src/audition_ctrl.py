@@ -61,6 +61,10 @@ class AuditionCtrl:
             self.app_conf.get(AuditionCtrl.AUAU_SECTION, "key_typing_sleep")
         )
 
+        self.keys_detector.set_two_hands_mode(bool(self.app_conf.get(
+            AuditionCtrl.AUAU_SECTION, "two_hands_mode"
+        )))
+
         perfect_width = AuditionCtrl.PERFECT_AREA[2] - AuditionCtrl.PERFECT_AREA[0]
         AuditionCtrl.PERFECT_HEAD = perfect_width // 4
         AuditionCtrl.PERFECT_TAIL = perfect_width * 3 // 4
