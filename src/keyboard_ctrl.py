@@ -1,3 +1,5 @@
+# Ref: https://stackoverflow.com/a/13615802
+
 import ctypes
 from ctypes import wintypes
 import time
@@ -17,8 +19,10 @@ class KeyEvent:
 
 MAPVK_VK_TO_VSC = 0
 
-# msdn.microsoft.com/en-us/library/dd375731
 class KeyDef:
+  """
+  Ref: msdn.microsoft.com/en-us/library/dd375731
+  """
   VK_TAB  = 0x09
   VK_MENU = 0x12
   VK_BACKSPACE = 0x08
