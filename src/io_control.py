@@ -1,9 +1,9 @@
-from pywinauto.application import Application, WindowSpecification
-import pywinauto.mouse as mouse
-import pywinauto.keyboard as keyboard
 import time
 
+from pywinauto.application import Application, WindowSpecification
+
 from .app_conf import AppConf
+from .keyboard_ctrl import KeyboardCtrl
 
 
 class IoControl:
@@ -29,7 +29,8 @@ class IoControl:
         return (rect.left, rect.top, rect.right, rect.bottom)
 
     def send_keys(self, keys: list):
+        if type(keys) is int:
+            keys = [keys]
         for key in keys:
-            # print(key)
-            keyboard.send_keys(key)
+            KeyboardCtrl.press_and_release(key)
             time.sleep(self.key_typing_sleep)

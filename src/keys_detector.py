@@ -2,19 +2,21 @@ import cv2
 import imutils
 import numpy as np
 
+from .keyboard_ctrl import KeyDef
 from .utils import *
 
 
 class KeysDetector:
     KEYS_THRESHOLD = 254
-    LEFT = 0
-    UP = 1
-    RIGHT = 2
-    DOWN = 3
-    KEY_LEFT = ["{LEFT down}", "{LEFT up}"]
-    KEY_UP = ["{UP down}", "{UP up}"]
-    KEY_RIGHT = ["{RIGHT down}", "{RIGHT up}"]
-    KEY_DOWN = ["{DOWN down}", "{DOWN up}"]
+    K4_8_THRESHOLD = 0.63
+    UP = "UP"
+    DOWN = "DOWN"
+    LEFT = "LEFT"
+    RIGHT = "RIGHT"
+    UP_LEFT = "UP_LEFT"
+    DOWN_LEFT = "DOWN_LEFT"
+    UP_RIGHT = "UP_RIGHT"
+    DOWN_RIGHT = "DOWN_RIGHT"
 
     LOWER_BLUE = np.array([110, 100, 100])
     UPPER_BLUE = np.array([130, 255, 255])
@@ -38,7 +40,7 @@ class KeysDetector:
                 color_key_roi = self.get_key_roi(orig, bb)
                 direction = self.get_direction(key_roi, color_key_roi)
                 key = self.direction_to_key(direction)
-                keys.extend(key)
+                keys.append(key)
 
         except Exception as e:
             pass
@@ -85,7 +87,30 @@ class KeysDetector:
         rate3 = cv2.countNonZero(reg3)
 
         arr = np.array((rate0, rate1, rate2, rate3))
-        direction = np.argmax(arr)
+        sorted_idx = arr.argsort()[::-1]
+        max_idx1 = sorted_idx[0]
+        max_idx2 = sorted_idx[1]
+        max1 = arr[max_idx1]
+        max2 = arr[max_idx2]
+        if max2 / max1 < KeysDetector.K4_8_THRESHOLD:
+            if max_idx1 == 0: direction = KeysDetector.LEFT
+            elif max_idx1 == 1: direction = KeysDetector.UP
+            elif max_idx1 == 2: direction = KeysDetector.RIGHT
+            elif max_idx1 == 3: direction = KeysDetector.DOWN
+        else:
+            if max_idx1 == 0 and max_idx2 == 1: direction = KeysDetector.UP_LEFT
+            elif max_idx2 == 0 and max_idx1 == 1: direction = KeysDetector.UP_LEFT
+
+            elif max_idx1 == 0 and max_idx2 == 3: direction = KeysDetector.DOWN_LEFT
+            elif max_idx2 == 0 and max_idx1 == 3: direction = KeysDetector.DOWN_LEFT
+
+            elif max_idx1 == 2 and max_idx2 == 1: direction = KeysDetector.UP_RIGHT
+            elif max_idx2 == 2 and max_idx1 == 1: direction = KeysDetector.UP_RIGHT
+
+            elif max_idx1 == 2 and max_idx2 == 3: direction = KeysDetector.DOWN_RIGHT
+            elif max_idx2 == 2 and max_idx1 == 3: direction = KeysDetector.DOWN_RIGHT
+
+            # else: direction = KeysDetector.UP
 
         if self.is_reversed(color_key_roi):
             direction = self.reverse_direction(direction)
@@ -114,13 +139,29 @@ class KeysDetector:
             return KeysDetector.RIGHT
         elif direction == KeysDetector.RIGHT:
             return KeysDetector.LEFT
+        elif direction == KeysDetector.UP_LEFT:
+            return KeysDetector.DOWN_RIGHT
+        elif direction == KeysDetector.UP_RIGHT:
+            return KeysDetector.DOWN_LEFT
+        elif direction == KeysDetector.DOWN_LEFT:
+            return KeysDetector.UP_RIGHT
+        elif direction == KeysDetector.DOWN_RIGHT:
+            return KeysDetector.UP_LEFT
 
     def direction_to_key(self, direction):
         if direction == KeysDetector.UP:
-            return KeysDetector.KEY_UP
+            return KeyDef.VK_NUMPAD8
         elif direction == KeysDetector.DOWN:
-            return KeysDetector.KEY_DOWN
+            return KeyDef.VK_NUMPAD2
         elif direction == KeysDetector.LEFT:
-            return KeysDetector.KEY_LEFT
+            return KeyDef.VK_NUMPAD4
         elif direction == KeysDetector.RIGHT:
-            return KeysDetector.KEY_RIGHT
+            return KeyDef.VK_NUMPAD6
+        elif direction == KeysDetector.UP_LEFT:
+            return KeyDef.VK_NUMPAD7
+        elif direction == KeysDetector.DOWN_LEFT:
+            return KeyDef.VK_NUMPAD1
+        elif direction == KeysDetector.UP_RIGHT:
+            return KeyDef.VK_NUMPAD9
+        elif direction == KeysDetector.DOWN_RIGHT:
+            return KeyDef.VK_NUMPAD3

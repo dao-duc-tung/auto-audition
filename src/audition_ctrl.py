@@ -1,16 +1,18 @@
-import cv2
-import mss
-import numpy as np
 import signal
 import threading
 import time
-import keyboard
 
+import cv2
+import keyboard
+import mss
+import numpy as np
+
+from .app_conf import AppConf
 from .io_control import IoControl
+from .keyboard_ctrl import KeyDef
 from .keys_detector import KeysDetector
 from .perfect_detector import PerfectDetector
 from .sct_img import SctImg
-from .app_conf import AppConf
 from .utils import *
 
 
@@ -67,9 +69,9 @@ class AuditionCtrl:
         perfect_area = self.get_area_pos(AuditionCtrl.PERFECT_AREA)
         self.perfect_detector.set_perfect_area(perfect_area)
 
-        keyboard.add_hotkey("home", self.measure_speed)
-        keyboard.add_hotkey("page up", self.increase_adjustment)
-        keyboard.add_hotkey("page down", self.decrease_adjustment)
+        keyboard.add_hotkey("f5", self.measure_speed)
+        keyboard.add_hotkey("f6", self.increase_adjustment)
+        keyboard.add_hotkey("f7", self.decrease_adjustment)
         keyboard.add_hotkey("backspace", lambda : self.exit_handler(None, None))
 
     def increase_adjustment(self):
@@ -118,6 +120,10 @@ class AuditionCtrl:
         keys_area = self.get_area_pos(AuditionCtrl.KEYS_AREA)
         sct = capture(keys_area)
         keys = self.keys_detector.detect(sct.img)
+        # from PIL import Image
+        # img = Image.fromarray(sct.img)
+        # img.save(f"k8.png")
+        # print(keys)
         return keys
 
     def control_perfect(self):
@@ -135,7 +141,7 @@ class AuditionCtrl:
             sleep_time = perfect_time - time.time() + AuditionCtrl.PERFECT_ADJUSTMENT
             if sleep_time > 0:
                 time.sleep(sleep_time)
-            self.io_control.send_keys(self.perfect_detector.KEY_SPACE)
+            self.io_control.send_keys(KeyDef.VK_SPACE)
 
         t = threading.Thread(target=func)
         t.start()
