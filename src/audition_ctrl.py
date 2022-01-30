@@ -2,17 +2,13 @@ import signal
 import threading
 import time
 
-import cv2
 import keyboard
-import mss
-import numpy as np
 
 from .app_conf import AppConf
 from .io_control import IoControl
 from .keyboard_ctrl import KeyDef
 from .keys_detector import KeysDetector
 from .perfect_detector import PerfectDetector
-from .sct_img import SctImg
 from .utils import *
 
 
@@ -74,32 +70,33 @@ class AuditionCtrl:
         self.perfect_detector.set_perfect_area(perfect_area)
 
         keyboard.add_hotkey("f5", self.measure_speed)
-        keyboard.add_hotkey("f6", self.increase_adjustment)
-        keyboard.add_hotkey("f7", self.decrease_adjustment)
-        keyboard.add_hotkey("backspace", lambda : self.exit_handler(None, None))
+        keyboard.add_hotkey("f6", self.increase_speed)
+        keyboard.add_hotkey("f7", self.decrease_speed)
+        keyboard.add_hotkey("f9", lambda : self.exit_handler(None, None))
 
-    def increase_adjustment(self):
-        AuditionCtrl.PERFECT_ADJUSTMENT = round(
-            AuditionCtrl.PERFECT_ADJUSTMENT + AuditionCtrl.PERFECT_ADJUSTMENT_UNIT, 2
-        )
-        print(AuditionCtrl.PERFECT_ADJUSTMENT)
+        self.control_keys_thread = threading.Thread(target=self.control_keys)
+        self.control_perfect_thread = threading.Thread(target=self.control_perfect)
+        self.hit_perfect_thread = threading.Thread(target=self.hit_perfect)
 
-    def decrease_adjustment(self):
-        AuditionCtrl.PERFECT_ADJUSTMENT = round(
-            AuditionCtrl.PERFECT_ADJUSTMENT - AuditionCtrl.PERFECT_ADJUSTMENT_UNIT, 2
-        )
-        print(AuditionCtrl.PERFECT_ADJUSTMENT)
+    def increase_speed(self):
+        self.speed += AuditionCtrl.PERFECT_ADJUSTMENT_UNIT
+        print(self.speed)
+
+    def decrease_speed(self):
+        self.speed -= AuditionCtrl.PERFECT_ADJUSTMENT_UNIT
+        print(self.speed)
 
     def run(self):
         self.io_control.focus()
-        self.measure_speed()
+        self.speed = self.app_conf.get(AuditionCtrl.AUAU_SECTION, "speed")
+        if self.speed == None:
+            self.measure_speed()
 
-        t1 = threading.Thread(target=self.control_keys)
-        t1.start()
+        print(self.speed)
+        self.control_keys_thread.start()
 
         if self.app_conf.get(AuditionCtrl.AUAU_SECTION, "auto_perfect"):
-            t2 = threading.Thread(target=self.control_perfect)
-            t2.start()
+            self.control_perfect_thread.start()
 
         while self.running:
             time.sleep(AuditionCtrl.RUN_SLEEP * 2)
@@ -137,18 +134,14 @@ class AuditionCtrl:
             perfect_time = self.perfect_detector.get_wait_perfect(self.speed)
             self.hit_perfect(perfect_time)
 
-            self.wait_marker_at_tail()
+            # self.wait_marker_at_tail()
             time.sleep(AuditionCtrl.RUN_SLEEP)
 
     def hit_perfect(self, perfect_time):
-        def func():
-            sleep_time = perfect_time - time.time() + AuditionCtrl.PERFECT_ADJUSTMENT
-            if sleep_time > 0:
-                time.sleep(sleep_time)
-            self.io_control.send_keys(KeyDef.VK_SPACE)
-
-        t = threading.Thread(target=func)
-        t.start()
+        sleep_time = perfect_time - time.time() + AuditionCtrl.PERFECT_ADJUSTMENT
+        if sleep_time > 0:
+            time.sleep(sleep_time)
+        self.io_control.send_keys(KeyDef.VK_SPACE)
 
     def wait_marker_at_head(self):
         while True and self.running:
