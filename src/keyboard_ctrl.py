@@ -27,9 +27,15 @@ class KeyDef:
   VK_MENU = 0x12
   VK_BACKSPACE = 0x08
   VK_SPACE = 0x20
+  VK_CONTROL = 0x11
   VK_F5 = 0x74
   VK_F6 = 0x75
   VK_F7 = 0x76
+
+  VK_LEFT = 0x25
+  VK_UP = 0x26
+  VK_RIGHT = 0x27
+  VK_DOWN = 0x28
 
   VK_NUMPAD1 = 0x61 # 97
   VK_NUMPAD2 = 0x62 # 98

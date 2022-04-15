@@ -32,9 +32,13 @@ class KeysDetector:
 
     def __init__(self):
         self.is_two_hands_mode = False
+        self.is_eight_keys_mode = False
 
     def set_two_hands_mode(self, val):
         self.is_two_hands_mode = val
+
+    def set_eight_keys_mode(self, val):
+        self.is_eight_keys_mode = val
 
     def detect(self, orig) -> str:
         keys = []
@@ -171,13 +175,13 @@ class KeysDetector:
 
     def direction_to_key(self, direction):
         if direction == KeysDetector.UP:
-            return KeyDef.VK_NUMPAD8
+            return KeyDef.VK_UP
         elif direction == KeysDetector.DOWN:
-            return KeyDef.VK_NUMPAD2
+            return KeyDef.VK_DOWN
         elif direction == KeysDetector.LEFT:
-            return KeyDef.VK_NUMPAD4
+            return KeyDef.VK_LEFT
         elif direction == KeysDetector.RIGHT:
-            return KeyDef.VK_NUMPAD6
+            return KeyDef.VK_RIGHT
         elif direction == KeysDetector.UP_LEFT:
             return KeyDef.VK_NUMPAD7
         elif direction == KeysDetector.DOWN_LEFT:

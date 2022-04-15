@@ -61,6 +61,10 @@ class AuditionCtrl:
             AuditionCtrl.AUAU_SECTION, "two_hands_mode"
         )))
 
+        self.keys_detector.set_eight_keys_mode(bool(self.app_conf.get(
+            AuditionCtrl.AUAU_SECTION, "eight_keys_mode"
+        )))
+
         perfect_width = AuditionCtrl.PERFECT_AREA[2] - AuditionCtrl.PERFECT_AREA[0]
         AuditionCtrl.PERFECT_HEAD = perfect_width // 4
         AuditionCtrl.PERFECT_TAIL = perfect_width * 3 // 4
@@ -141,7 +145,7 @@ class AuditionCtrl:
         sleep_time = perfect_time - time.time() + AuditionCtrl.PERFECT_ADJUSTMENT
         if sleep_time > 0:
             time.sleep(sleep_time)
-        self.io_control.send_keys(KeyDef.VK_SPACE)
+        self.io_control.send_keys(KeyDef.VK_CONTROL)
 
     def wait_marker_at_head(self):
         while True and self.running:
