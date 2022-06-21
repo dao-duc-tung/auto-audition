@@ -5,14 +5,12 @@
 .idea/
 .vs/
 *.pyproj.user
-.vscode/
 
 rc_*.py
 */resources_rc.py
 
 *.egg-info
 
-*.json
 *.ini
 *.log
 *.stl
